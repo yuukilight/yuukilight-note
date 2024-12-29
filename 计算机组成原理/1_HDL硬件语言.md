@@ -21,6 +21,15 @@ vvp xxx.vvp(or xxx.out) -lxt2
 gtkwave xxx.vcd
 ```
 
+### 基本语法
+包含其它模块文件
+```verilog
+`include "nand.v"
+```
+
+```
+```
+
 ### 其它
 iverilog 中
 输出 x 表示输出不确定。
