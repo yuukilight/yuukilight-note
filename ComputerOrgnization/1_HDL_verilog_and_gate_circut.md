@@ -1,5 +1,6 @@
 [toc]
 ## iverilog window环境配置和使用
+[主要参考资料](https://zhuanlan.zhihu.com/p/95081329)
 Icarus Verilog: vero;pg HDL 的开源编译器。
 vvp, Verilog Virtual Processor： 仿真引擎，用于执行编译后的verilog 文件。
 GTKWAVE, GTK Waveform Viewer: 查看VCD,LXT(Large eXtensible Trace),LXT2 等波形文件的图形化工具。
