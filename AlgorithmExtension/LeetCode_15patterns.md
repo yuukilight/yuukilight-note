@@ -1,0 +1,15 @@
+- prefix sum
+- Two point
+- sliding window
+- fast & slow pointer
+- linked list in-place reversal
+- monotonic stack
+- top's k elements
+- quick select
+- overlapping intervals
+- modified binary search
+- depth-first search
+- breadth-first search
+- matrix traversal
+- backtracking
+- dynamic programming
