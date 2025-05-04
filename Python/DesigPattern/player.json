@@ -1,0 +1,16 @@
+{
+    "players": [
+        {
+            "name": "Eric Cantona",
+            "role": "FW"
+        },
+        {
+            "name": "David Backham",
+            "role": "MF"
+        },
+        {
+            "name": "Steven Bruce",
+            "role": "DF"
+        }
+    ]
+}
