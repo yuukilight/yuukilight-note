@@ -87,6 +87,18 @@ class Variable(Node):
         super().__init__()
         self.data = init_value
 
+# create session to update nodes' data in the graph
+class Session(object):
+    def run(self, root_op : Operation, feed_dict : dict = {}):
+        for node in _default_graph:
+            if isinstance(node, Variable):
+                node.data = np.array(node.data)
+            elif isinstance(node, Placeholder):
+                node.data = np.array(feed_dict[node])
+            else:
+                input_datas = [n.data for n in node.input_nodes]
+                node.data = node.compute(*input_datas)
+        return root_op
 
 # ==============================
 # basic function used in core.py
