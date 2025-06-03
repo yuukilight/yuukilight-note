@@ -1,7 +1,8 @@
-from .core     import Operation, Placeholder, Variable, Node
+from educational_framework.core import Operation, Placeholder, Variable, Node
 # from SimpleTensor.constant import runtime
 from collections import deque, defaultdict
 import numpy as np
+from educational_framework.constant import runtime
 
 def get_node_attr(node: Node) -> dict:
     if isinstance(node, Placeholder):

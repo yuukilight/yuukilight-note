@@ -1,8 +1,10 @@
 import numpy as np
 from queue import Queue
 from typing import Union, List
+import abc
 
-from utils import Register
+from utils import Register, back_print
+from educational_framework.constant import runtime
 
 class Node: pass
 # class add: pass
@@ -12,10 +14,7 @@ class Node: pass
 # class matmul: pass
 # class elementwise_pow: pass
 
-_register_act_functions = Register()
-_default_graph = []
-
-class Node(object):
+class Node(abc.ABC):
     def __init__(self, node_name: str=""):
         """
             base for all types of node in the static calculation graph
@@ -23,7 +22,7 @@ class Node(object):
         self.next_nodes = []
         self.data = None
         self.node_name = node_name
-        _default_graph.append(self)
+        runtime.global_calc_graph.append(self)
     
     def __neg__(self):
         return negative(self)
@@ -68,37 +67,63 @@ class Node(object):
             raise ValueError(f"the node {self.__class__} is empty, please run the session first!")
         return list(self.data)
     
-class Operation(Node):
+class Operation(Node, abc.ABC):
     def __init__(self, input_nodes : List[Node] = [], node_name: str=""):
         super().__init__(node_name=node_name)
         self.input_nodes = input_nodes
         for node in input_nodes:
             node.next_nodes.append(self)
     
+    @abc.abstractmethod
     def compute(self, *args):
         pass
 
-class Placeholder(Node):
-    def __init__(self):
-        super().__init__()
+class Placeholder(Node): ...
+
+class Data(Node):
+    def __init__(self, data, node_name: str = ""):
+        super().__init__(node_name)
+        if not isinstance(data, np.ndarray):
+            raise TypeError("data must be a numpy array!")
+        self.data = data
 
 class Variable(Node):
-    def __init__(self, init_value : Union[np.ndarray, list] = None):
-        super().__init__()
+    def __init__(self, init_value : Union[np.ndarray, list] = None, node_name:str=""):
+        super().__init__(node_name=node_name)
         self.data = init_value
 
-# create session to update nodes' data in the graph
 class Session(object):
+    """create session to update nodes' data in the graph
+    """
     def run(self, root_op : Operation, feed_dict : dict = {}):
-        for node in _default_graph:
+        for node in runtime.global_calc_graph:
             if isinstance(node, Variable):
                 node.data = np.array(node.data)
             elif isinstance(node, Placeholder):
                 node.data = np.array(feed_dict[node])
-            else:
+            elif isinstance(node, Operation):
                 input_datas = [n.data for n in node.input_nodes]
                 node.data = node.compute(*input_datas)
+            else:
+                raise TypeError(f"Unknown node tpye in global calculation graph: {type(node)}.")
+
         return root_op
+    
+class DnnOperator(abc.ABC):
+    def __init__(self) -> None:
+        self.cur_name = self.__class__.__name__ + "_" + str(runtime.dnn_cnt[self.__class__.__name__])
+        runtime.dnn_cnt[self.__class__.__name__] += 1
+
+    @abc.abstractmethod
+    def __call__(self) -> Node: ...
+
+class DnnVarOperator(DnnOperator):
+    @abc.abstractmethod
+    def reset_params(self) -> None:  ...
+
+    @abc.abstractmethod
+    def get_params(self, *args, **kwargs) -> np.ndarray: ...
+
 
 # ==============================
 # basic function used in core.py
@@ -162,48 +187,11 @@ class reduce_mean(Operation):
     def compute(self, x_v : np.ndarray):
         return np.mean(x_v, axis=self.axis)
 
-# class log(Operation):
-#     def __init__(self, x : Node, node_name: str=""):
-#         super().__init__(input_nodes=[x], node_name=node_name)
-    
-#     def compute(self, x_v : np.ndarray):
-#         if (x_v <= 0).any():
-#             back_print("Oops, invalid value encountered in 'log', I guess you forget activation function", color="yellow")
-#         return np.log(x_v)
-
-@_register_act_functions("sigmoid")
-class sigmoid(Operation):
-    def __init__(self, x : Node):
-        super().__init__(input_nodes=[x])
+class log(Operation):
+    def __init__(self, x : Node, node_name: str=""):
+        super().__init__(input_nodes=[x], node_name=node_name)
     
     def compute(self, x_v : np.ndarray):
-        return 1 / (1 + np.exp(-1. * x_v))
-    
-class Linear(object):
-    def __init__(self, input_dim : int, output_dim : int, bias : bool = True, act : str = None):
-        self.input_dim = input_dim
-        self.output_dim = output_dim
-        if act and act not in _register_act_functions:
-            raise ValueError(f"input activate function '{act}' is not in registered activate function list:{list(_register_act_functions.keys())}")
-        self.act = act
-        self.W = Variable(np.random.randn(input_dim, output_dim))
-        if bias:
-            self.b = Variable(np.random.randn(1, output_dim))
-    
-    def __call__(self, X : Node):
-        if not isinstance(X, Node):
-            raise ValueError("Linear's parameter X must be a Node!")
-        out = X @ self.W + self.b
-        if self.act:
-            act_func = _register_act_functions[self.act]
-            return act_func(out)
-        else:
-            return out
-        
-
-
-if __name__ == "__main__":
-    from tmp import view_graph
-    X = Placeholder()
-    out = Linear(13, 1, bias=True)(X)
-    view_graph(node=_default_graph[-1], format="pdf")
+        if (x_v <= 0).any():
+            back_print("Oops, invalid value encountered in 'log', I guess you forget activation function", color="yellow")
+        return np.log(x_v)

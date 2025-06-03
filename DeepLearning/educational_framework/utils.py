@@ -63,3 +63,13 @@ def back_print(*args, color: str = None) -> None:
         print(*args)
     else:
         print(getattr(Back, color.upper(), ""), *args, Style.RESET_ALL)
+
+def fore_print(*args, color:str = None) -> None:
+    if color is None:
+        print(*args)
+    else:
+        print(getattr(Fore, color.upper(), ""), *args, Style.RESET_ALL)
+
+# def numpy_node_hot(y: np.ndarray, class_num: int=None) -> np.ndarray:
+#     y = y.reshape(-1)
+#     if class
