@@ -25,6 +25,8 @@ Linux系统中一般默认使用bash，所以接下来讲解bash中的语法。
 
 echo "Hello World!"
 ```
+```#! ``` 其后指定了运行该文件所使用的解释器。可以直接通过 test.sh 执行，而不需要输入解释器（例如 bash test.sh）。
+
 通过通过执行文件执行
 ```shell
 acs@9e0ebfcd82d7:~$ chmod +x test.sh  # 使脚本具有可执行权限
