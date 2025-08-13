@@ -77,5 +77,18 @@ InstructGPT 相对于之前的 GPT 系列，有以下几点值得注意：
 - Alignment tunning: 利用RLHF(reinforcement learning with human feedback) 实现微调，避免输出一些不安全或者不符合人类正向价值观的回复。
 - Tools manipulation: 工具操作。让模型能使用搜索引擎，计算器或者给模型安装插件等工具。
 
+## 各种名词解释与由来
+**Prompt**
+user prompt
+Agent Tools
+Fcuntion Calling
+System Prompt
+AI Agent
+MCP
+
+system prompt -> function calling
+
+
 ## 参考文章
 [万字长文入门大语言模型（LLM）](https://zhuanlan.zhihu.com/p/654041855)
+
