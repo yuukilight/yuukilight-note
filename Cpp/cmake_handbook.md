@@ -1,3 +1,17 @@
+## CMake 使用基本命令和知识
+```cmake
+# 读取当前目录的 CMakeLists.txt 并在 build 文件夹下生成 build/Makefile
+cmake -B build
+# 读取相关的 Makefile 并开始构建
+cmake --build build
+```
+
+ELF: Executable and linkable Format, 在 linux 中”.o“文件和 ”.so“文件的储存格式，其中的RPATH指向具体地址。
+
+## 一些基本语法
+add_executable(): 生成可执行文件
+add_library(name STATIC/SHARED): 生成静态/动态库
+
 ## CMake 检测 python 解释器和python 库
 
 1. cpp 中使用 python 脚本
