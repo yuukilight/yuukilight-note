@@ -42,3 +42,7 @@ Mutex(Mutual exclusion), 互斥锁
 优点2：强制自己初始化值，避免 UB(Undefined Behavior) 的出现。
 
 右值引用的使用场景
+
+
+不同方式生成库的区别，使用 visual studio 生成的好处。
+
