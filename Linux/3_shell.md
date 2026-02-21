@@ -9,12 +9,12 @@ shell是我们通过命令行与操作系统沟通的语言。
 shell脚本可以直接在命令行中执行，也可以将一套逻辑组织成一个文件，方便复用。
 
 Linux中常见的shell脚本有很多种，常见的有：
-Bourne Shell(/usr/bin/sh或/bin/sh)
-Bourne Again Shell(/bin/bash)
-C Shell(/usr/bin/csh)
-K Shell(/usr/bin/ksh)
-zsh
-…
+- Bourne Shell(/usr/bin/sh或/bin/sh)
+- Bourne Again Shell(/bin/bash)
+- C Shell(/usr/bin/csh)
+- K Shell(/usr/bin/ksh)
+- zsh
+- …
 Linux系统中一般默认使用bash，所以接下来讲解bash中的语法。
 文件开头需要写```#! /bin/bash```，指明bash为脚本解释器。
 
@@ -240,15 +240,93 @@ echo ${#array[@]}  # 第一种写法
 echo ${#array[*]}  # 第二种写法
 ```
 
+### expr命令
+expr命令用于求表达式的值，格式为：
+```bash
+expr 表达式
+```
+表达式说明：
 
-expr命令
-read命令
-echo命令
-printf命令
-test命令与判断符号[]
-判断语句
-循环语句
-函数
-exit命令
-文件重定向
-引入外部脚本
+- 用空格隔开每一项
+- 用反斜杠放在shell特定的字符前面（发现表达式运行错误时，可以试试转义）
+- 对包含空格和其他特殊字符的字符串要用引号括起来
+- expr会在stdout中输出结果。如果为逻辑关系表达式，则结果为真时，stdout输出1，否则输出0。
+- expr的exit code：如果为逻辑关系表达式，则结果为真时，exit code为0，否则为1。
+
+***
+
+#### 字符串表达式
+- ```length STRING```
+返回```STRING```的长度
+- ```index STRING CHARSET```
+CHARSET中任意单个字符在STRING中最前面的字符位置，下标从1开始。如果在STRING中完全不存在CHARSET中的字符，则返回0。
+substr STRING POSITION LENGTH
+返回STRING字符串中从POSITION开始，长度最大为LENGTH的子串。如果POSITION或LENGTH为负数，0或非数值，则返回空字符串。
+示例：
+
+str="Hello World!"
+
+echo `expr length "$str"`  # ``不是单引号，表示执行该命令，输出12
+echo `expr index "$str" aWd`  # 输出7，下标从1开始
+echo `expr substr "$str" 2 3`  # 输出 ell
+整数表达式
+expr支持普通的算术操作，算术表达式优先级低于字符串表达式，高于逻辑关系表达式。
+
++ -
+加减运算。两端参数会转换为整数，如果转换失败则报错。
+
+* / %
+乘，除，取模运算。两端参数会转换为整数，如果转换失败则报错。
+
+() 可以改变优先级，但需要用反斜杠转义
+
+示例：
+
+a=3
+b=4
+
+echo `expr $a + $b`  # 输出7
+echo `expr $a - $b`  # 输出-1
+echo `expr $a \* $b`  # 输出12，*需要转义
+echo `expr $a / $b`  # 输出0，整除
+echo `expr $a % $b` # 输出3
+echo `expr \( $a + 1 \) \* \( $b + 1 \)`  # 输出20，值为(a + 1) * (b + 1)
+逻辑关系表达式
+|
+如果第一个参数非空且非0，则返回第一个参数的值，否则返回第二个参数的值，但要求第二个参数的值也是非空或非0，否则返回0。如果第一个参数是非空或非0时，不会计算第二个参数。
+&
+如果两个参数都非空且非0，则返回第一个参数，否则返回0。如果第一个参为0或为空，则不会计算第二个参数。
+
+< <= = == != >= >
+比较两端的参数，如果为true，则返回1，否则返回0。”==”是”=”的同义词。”expr”首先尝试将两端参数转换为整数，并做算术比较，如果转换失败，则按字符集排序规则做字符比较。
+
+() 可以改变优先级，但需要用反斜杠转义
+示例：
+
+a=3
+b=4
+
+echo `expr $a \> $b`  # 输出0，>需要转义
+echo `expr $a '<' $b`  # 输出1，也可以将特殊字符用引号引起来
+echo `expr $a '>=' $b`  # 输出0
+echo `expr $a \<\= $b`  # 输出1
+
+c=0
+d=5
+
+echo `expr $c \& $d`  # 输出0
+echo `expr $a \& $b`  # 输出3
+echo `expr $c \| $d`  # 输出5
+echo `expr $a \| $b`  # 输出3
+
+
+### read命令
+### echo命令
+### printf命令
+### test命令与判断符号[]
+### 判断语句
+### 循环语句
+### 函数
+### exit命令
+### 文件重定向
+### 引入外部脚本
